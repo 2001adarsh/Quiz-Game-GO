@@ -2,18 +2,14 @@ package Play
 
 import (
 	"encoding/csv"
-	"flag"
 	"log"
 	"os"
 )
 
-func readFromCSV() [][]string {
-	csvFileName := flag.String("csv", "./problems.csv", "a csv file in the format of `question, answer`")
-	flag.Parse()
-
-	file , err := os.Open(*csvFileName)
+func readFromCSV(csvFileName *string) [][]string {
+	file, err := os.Open(*csvFileName)
 	if err != nil {
-		log.Fatal("Error in opening of File %s.\n", *csvFileName,  err)
+		log.Fatal("Error in opening of File %s.\n", *csvFileName, err)
 		os.Exit(1)
 	}
 	defer func(file *os.File) {

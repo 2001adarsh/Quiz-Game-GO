@@ -1,40 +1,23 @@
 package Play
 
 import (
+	"flag"
 	"fmt"
+	"time"
 )
+
+var changeStatus = make(chan int)
 
 func StartQuiz() {
 	fmt.Println("\tWELCOME TO THE QUIZ GAME")
 	fmt.Println("LET's BEGIN!")
-	records := readFromCSV()
-	questions, answers, total := getQuestionsAndAnswers(records)
-	correct := getUservalidations(questions, answers)
-	fmt.Printf("Your Result: %v out of %v", correct, total)
-	return
-}
+	csvFileName := flag.String("csv", "./problems.csv", "a csv file in the format of `question, answer`")
+	timeLimit := flag.Int("limit", 30, "the time limit for quiz in seconds")
+	flag.Parse()
 
-func getUservalidations(questions []string, answers []int) int {
-	correct := 0
-	var input int
-	for i:=0; i<len(questions); i++{
-		fmt.Printf("Problem #%d: %s = ", i, questions[i])
-		fmt.Scanln(&input)
-		if input == answers[i] {
-			correct++
-		}
-	}
-	return correct
-}
+	records := readFromCSV(csvFileName)
+	problems := getQuestionsAndAnswers(records)
 
-func getQuestionsAndAnswers(records [][]string) ([]string, []int, int) {
-	total := len(records)
-	var questions []string
-	var answers []int
-
-	for _, line := range records {
-		questions = append(questions, line[0])
-		answers = append(answers, convertToInt(line[1]))
-	}
-	return questions, answers, total
+	timer := time.NewTimer(time.Duration(*timeLimit) * time.Second)
+	getUservalidations(problems, timer)
 }
